@@ -310,7 +310,8 @@
 
                 var output_idx = 0;
 
-                var sum_outptus = 0;
+                var sum_outptus_cash  = 0;
+                var sum_outputs_token = 0;
 
                 tx_json.vout.forEach(function(output) {
 
@@ -325,6 +326,9 @@
 
                     var mine_output_str = "false";
 
+
+                    var type = output.target.type;
+
                     if (!mine_output && add_tx_pub_keys.length == tx_json.vout.length) {
 
                         pubkey_generated = derive_public_key(add_key_derivation[output_idx],
@@ -338,7 +342,10 @@
 
                         mine_output_str = '<span style="color: #008009;font-weight: bold">true</span>';
 
-                        sum_outptus += amount;
+                        if(type == "txout_to_key")
+                            sum_outptus_cash += amount;
+                        if(type == "txout_token_to_key")
+                            sum_outputs_token += amount;
                     }
 
                     decoding_results_str += "<tr>"
@@ -355,7 +362,11 @@
 
                 decoding_results_str += "</table>";
 
-                decoding_results_str += "<h3>Sum SFX from matched outputs (i.e., incoming SFX): " + (sum_outptus / 1e12) + "</h3>"
+                decoding_results_str += "<h3>Sum SFT from matched outputs (i.e., incoming SFT): " + (sum_outputs_token / 1e12) + "</h3>"
+
+
+                decoding_results_str += "<h3>Sum SFX from matched outputs (i.e., incoming SFX): " + (sum_outptus_cash / 1e12) + "</h3>"
+
 
 
                 // decrypt payment_id8 which results in using

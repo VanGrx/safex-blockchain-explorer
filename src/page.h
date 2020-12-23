@@ -194,7 +194,7 @@ namespace safexeg
     // key images of inputs
     vector<displayable_input> input_key_imgs;
 
-    // public keys and xmr amount of outputs
+    // public keys and pair Safex amount,type of outputs
     //displayable_output
     vector<pair<displayable_output, uint64_t>> output_pub_keys;
 
@@ -1843,7 +1843,8 @@ namespace safexeg
 
         mstch::array outputs;
 
-        uint64_t sum_xmr{0};
+        uint64_t sum_sfx{0};
+        uint64_t sum_sft{0};
 
         std::vector<uint64_t> money_transfered(tx.vout.size(), 0);
 
@@ -1917,7 +1918,10 @@ namespace safexeg
 
           if (mine_output)
           {
-            sum_xmr += outp.second;
+            if(outp.first.type() == typeid(txout_to_key))
+              sum_sfx += outp.second;
+            if(outp.first.type() == typeid(txout_token_to_key))
+              sum_sft += outp.second;
           }
 
           outputs.push_back(mstch::map{
@@ -2275,8 +2279,9 @@ namespace safexeg
 
         context.emplace("outputs", outputs);
 
-        context["found_our_outputs"] = (sum_xmr > 0);
-        context["sum_xmr"] = safexeg::safex_amount_to_str(sum_xmr);
+        context["found_our_outputs"] = (sum_sfx > 0 || sum_sft > 0);
+        context["sum_sfx"] = safexeg::safex_amount_to_str(sum_sfx);
+        context["sum_sft"] = safexeg::safex_amount_to_str(sum_sft);
 
         context.emplace("inputs", inputs);
 
@@ -2291,11 +2296,11 @@ namespace safexeg
         // show spending only if sum of mixins is more than
         // what we get + fee, and number of perferctly matched
         // mixis is equal to number of inputs
-        if (sum_mixin_xmr > (sum_xmr + txd.fee)
+        if (sum_mixin_xmr > (sum_sfx + txd.fee)
             && no_of_matched_mixins == inputs.size())
         {
           //                  (outcoming    - incoming) - fee
-          possible_spending = (sum_mixin_xmr - sum_xmr) - txd.fee;
+          possible_spending = (sum_mixin_xmr - sum_sfx) - txd.fee;
         }
 
         context["possible_spending"] = safexeg::safex_amount_to_str(

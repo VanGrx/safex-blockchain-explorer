@@ -90,7 +90,16 @@
         <h3>
             Sum SFX from matched outputs (i.e., incoming SFX):
             {{#found_our_outputs}}
-                {{sum_xmr}}
+                {{sum_sfx}}
+            {{/found_our_outputs}}
+            {{^found_our_outputs}}
+                0.000000000000
+            {{/found_our_outputs}}
+        </h3>
+                <h3>
+            Sum SFT from matched outputs (i.e., incoming SFT):
+            {{#found_our_outputs}}
+                {{sum_sft}}
             {{/found_our_outputs}}
             {{^found_our_outputs}}
                 0.000000000000
